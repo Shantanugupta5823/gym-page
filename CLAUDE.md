@@ -88,7 +88,7 @@ If every working set of an exercise last session hit `repMax`, show a "↑ try +
 
 ## PWA requirements
 - `manifest`: name "Gym Log", short_name "Gym", `display: standalone`, theme/background `#0B0B0C`, 192 and 512 icons plus a maskable icon. `start_url` and `scope` must respect the Vite `base`.
-- Precache the app shell and exercise images. `registerType: 'autoUpdate'`, with a small "new version available — reload" toast.
+- Precache the app shell and exercise images. `registerType: 'prompt'` (an auto-reload could wipe an open workout), with a small "new version available — reload" toast.
 - Call `navigator.storage.persist()` on first run, so the browser is less likely to evict the data.
 
 ## Deployment (GitHub Pages)

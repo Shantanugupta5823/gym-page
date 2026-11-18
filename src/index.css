@@ -1,3 +1,5 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/space-grotesk';
 @import 'tailwindcss';
 
 @theme {
@@ -10,8 +12,8 @@
   --color-push: #A3E635;
   --color-pull: #7DD3FC;
   --color-legs: #FB923C;
-  --font-heading: 'Space Grotesk', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font-heading: 'Space Grotesk Variable', sans-serif;
+  --font-body: 'Inter Variable', sans-serif;
 }
 
 html, body, #root {
