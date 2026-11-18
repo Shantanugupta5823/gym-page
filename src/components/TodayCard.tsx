@@ -3,7 +3,7 @@ import { useSettings } from '@/db/settings'
 import { getNextRollingDay, getTodayDay } from '@/lib/rotation'
 import { useStartWorkout } from '@/lib/useStartWorkout'
 import { DAY_TYPE_STYLES } from '@/lib/dayType'
-import { estimateMinutes, getDayMuscles } from '@/lib/plan'
+import { estimateMinutes, getDayMuscles, getMainItems } from '@/lib/plan'
 import { useActiveWorkout, useExerciseMap, useFinishedWorkouts, usePlanDays } from '@/db/queries'
 
 export const TodayCard = () => {
@@ -59,7 +59,7 @@ export const TodayCard = () => {
       <h2 className="mt-1 font-heading text-2xl font-semibold">{dayToStart.name}</h2>
       <p className="mt-1 text-sm text-muted">{muscles.join(' · ')}</p>
       <p className="mt-1 text-sm text-muted">
-        {dayToStart.items.length} exercises · ~{estimateMinutes(dayToStart.items)} min
+        {getMainItems(dayToStart.items).length} exercises · ~{estimateMinutes(dayToStart.items)} min
       </p>
       <button className={`mt-4 min-h-12 w-full rounded-xl font-semibold text-bg ${style.bg}`} onClick={() => startWorkout(dayToStart)}>
         Start workout

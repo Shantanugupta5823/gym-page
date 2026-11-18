@@ -2,17 +2,19 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSettings } from '@/db/settings'
 import { addPlanDay } from '@/db/plan'
+import { usePlans } from '@/db/plans'
 import { useExerciseMap, usePlanDays } from '@/db/queries'
 import { PlanDayCard } from '@/components/plan/PlanDayCard'
-import { RotationPanel } from '@/components/plan/RotationPanel'
+import { PlanSwitcher } from '@/components/plan/PlanSwitcher'
 
 export const Plan = () => {
   const settings = useSettings()
   const planDays = usePlanDays()
+  const plans = usePlans()
   const exerciseMap = useExerciseMap()
   const [isEditing, setIsEditing] = useState(false)
 
-  if (!planDays) return null
+  if (!planDays || !plans) return null
 
   return (
     <main className="flex flex-col gap-4 p-5">
@@ -26,7 +28,7 @@ export const Plan = () => {
         </div>
       </header>
 
-      <RotationPanel settings={settings} planDays={planDays} />
+      <PlanSwitcher plans={plans} activePlanId={settings.activePlanId} isEditing={isEditing} />
 
       {planDays.map((day, index) => (
         <PlanDayCard
@@ -36,11 +38,12 @@ export const Plan = () => {
           exerciseMap={exerciseMap}
           isEditing={isEditing}
           restDefault={settings.restDefault}
+          isRestTimerEnabled={settings.isRestTimerEnabled}
         />
       ))}
 
       {isEditing && (
-        <button className="min-h-12 rounded-xl border border-dashed border-border text-sm text-muted" onClick={() => addPlanDay()}>
+        <button className="min-h-12 rounded-xl border border-dashed border-border text-sm text-muted" onClick={() => addPlanDay(settings.activePlanId)}>
           + Add day
         </button>
       )}

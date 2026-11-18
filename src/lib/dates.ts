@@ -55,3 +55,12 @@ export function formatDuration (totalSeconds: number): string {
   if (hours > 0) return `${hours}:${String(minutes).padStart(2, '0')}:${rest}`
   return `${minutes}:${rest}`
 }
+
+const MS_PER_MINUTE = 60_000
+const MINUTES_PER_HOUR = 60
+
+export function formatMinutes (ms: number): string {
+  const totalMinutes = Math.round(ms / MS_PER_MINUTE)
+  const hours = Math.floor(totalMinutes / MINUTES_PER_HOUR)
+  return hours > 0 ? `${hours}h ${totalMinutes % MINUTES_PER_HOUR}m` : `${totalMinutes}m`
+}

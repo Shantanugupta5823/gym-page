@@ -26,3 +26,11 @@ body {
   font-family: var(--font-body);
   color-scheme: dark;
 }
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

@@ -1,6 +1,6 @@
 import { SetRow } from '@/components/workout/SetRow'
 import { ExerciseImage } from '@/components/ExerciseImage'
-import { addSet } from '@/db/workouts'
+import { addSet, deleteSet } from '@/db/workouts'
 import { capitalize, formatRepRange } from '@/lib/plan'
 import { shouldIncreaseWeight } from '@/lib/progression'
 import { toDisplayWeight } from '@/lib/units'
@@ -58,9 +58,18 @@ export const ExerciseCard = ({ workoutId, item, exercise, sets, unit, increment,
           />
         ))}
       </div>
-      <button className="mt-3 min-h-11 w-full rounded-xl border border-border text-sm text-muted" onClick={() => addSet(workoutId, item.exerciseId)}>
-        + Add set
-      </button>
+      <div className="mt-3 flex gap-2">
+        <button className="min-h-11 flex-1 rounded-xl border border-border text-sm text-muted" onClick={() => addSet(workoutId, item.exerciseId)}>
+          + Add set
+        </button>
+        <button
+          className="min-h-11 flex-1 rounded-xl border border-border text-sm text-muted disabled:opacity-40"
+          disabled={sets.length <= 1}
+          onClick={() => deleteSet(sets[sets.length - 1].id ?? 0)}
+        >
+          − Remove set
+        </button>
+      </div>
     </section>
   )
 }

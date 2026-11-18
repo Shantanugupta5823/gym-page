@@ -1,10 +1,12 @@
 import { db } from '@/db/db'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { getLastSession } from '@/db/workouts'
-import type { BodyweightEntry, Exercise, PlanDay, Workout, WorkoutSet } from '@/db/types'
+import { PREP_EXERCISE_IDS } from '@/db/curatedExercises'
+import { getActivePlanDays } from '@/db/plans'
+import type { Exercise, PlanDay, Workout, WorkoutSet } from '@/db/types'
 
 export function usePlanDays (): PlanDay[] | undefined {
-  return useLiveQuery(() => db.planDays.orderBy('order').toArray(), [])
+  return useLiveQuery(getActivePlanDays, [])
 }
 
 export function useActiveWorkout (): Workout | null | undefined {
@@ -19,7 +21,7 @@ export function useFinishedWorkouts (): Workout[] | undefined {
 }
 
 export function useDoneSets (): WorkoutSet[] | undefined {
-  return useLiveQuery(() => db.sets.filter(set => set.done).toArray(), [])
+  return useLiveQuery(() => db.sets.filter(set => set.done && !PREP_EXERCISE_IDS.has(set.exerciseId)).toArray(), [])
 }
 
 export function useWorkoutSets (workoutId: number | undefined): WorkoutSet[] | undefined {
@@ -40,12 +42,4 @@ export function useExercises (): Exercise[] | undefined {
 export function useExerciseMap (): Map<string, Exercise> {
   const exercises = useExercises()
   return new Map((exercises ?? []).map(exercise => [exercise.id, exercise]))
-}
-
-export function useBodyweight (): BodyweightEntry[] | undefined {
-  return useLiveQuery(() => db.bodyweight.orderBy('date').toArray(), [])
-}
-
-export async function logBodyweight (kg: number, date: number): Promise<void> {
-  await db.bodyweight.add({ kg, date })
 }

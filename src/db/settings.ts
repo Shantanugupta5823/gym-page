@@ -5,6 +5,9 @@ import type { Settings } from '@/db/types'
 export const DEFAULT_SETTINGS: Settings = {
   unit: 'kg',
   rotationMode: 'rolling',
+  // Placeholder until the seed or the v6 upgrade stores the real active plan
+  activePlanId: 0,
+  isRestTimerEnabled: true,
   restDefault: 90,
   increment: 2.5,
   weeklyTarget: 6,

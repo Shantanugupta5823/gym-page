@@ -14,7 +14,7 @@ export const BottomNav = () => (
         <li key={tab.to} className="flex-1">
           <NavLink
             to={tab.to}
-            end
+            end={tab.to === '/'}
             className={({ isActive }) =>
               `flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs ${isActive ? 'text-push' : 'text-muted'}`
             }

@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { NumberInput } from '@/components/NumberInput'
+import { Select } from '@/components/Select'
 import { ExercisePicker } from '@/components/ExercisePicker'
-import { ExerciseImage } from '@/components/ExerciseImage'
+import { PlanItemRow } from '@/components/plan/PlanItemRow'
+import { useDragReorder } from '@/lib/useDragReorder'
 import { deletePlanDay, updatePlanDay } from '@/db/plan'
 import { DAY_TYPES, DAY_TYPE_STYLES } from '@/lib/dayType'
-import { estimateMinutes, formatRepRange } from '@/lib/plan'
-import type { DayType, Exercise, PlanDay, PlanItem } from '@/db/types'
+import { CURATED_EXERCISES, STRETCH_EXERCISES, WARMUP_EXERCISES } from '@/db/curatedExercises'
+import { estimateMinutes, getMainItems } from '@/lib/plan'
+import type { DayType, Exercise, ItemPhase, PlanDay, PlanItem } from '@/db/types'
 
 interface PlanDayCardProps {
   day: PlanDay
@@ -13,15 +15,26 @@ interface PlanDayCardProps {
   exerciseMap: Map<string, Exercise>
   isEditing: boolean
   restDefault: number
+  isRestTimerEnabled: boolean
 }
 
 const DEFAULT_SETS = 3
 const DEFAULT_REP_MIN = 8
 const DEFAULT_REP_MAX = 12
+const DEFAULT_PREP_SEC = 30
+const DEFAULT_STRETCH_ROUNDS = 2
 
-export const PlanDayCard = ({ day, dayNumber, exerciseMap, isEditing, restDefault }: PlanDayCardProps) => {
+type PickerKind = 'main' | ItemPhase
+
+const PICKERS = {
+  main: { title: 'Exercise library', library: CURATED_EXERCISES },
+  warmup: { title: 'Warm-up exercises', library: WARMUP_EXERCISES },
+  stretch: { title: 'Stretches', library: STRETCH_EXERCISES }
+}
+
+export const PlanDayCard = ({ day, dayNumber, exerciseMap, isEditing, restDefault, isRestTimerEnabled }: PlanDayCardProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [isPickerOpen, setIsPickerOpen] = useState(false)
+  const [pickerKind, setPickerKind] = useState<PickerKind | null>(null)
   const style = DAY_TYPE_STYLES[day.type]
   const dayId = day.id ?? 0
   const isExpanded = isOpen || isEditing
@@ -30,19 +43,32 @@ export const PlanDayCard = ({ day, dayNumber, exerciseMap, isEditing, restDefaul
   const patchItem = (index: number, patch: Partial<PlanItem>) => {
     return saveItems(day.items.map((item, itemIndex) => (itemIndex === index ? { ...item, ...patch } : item)))
   }
-  const moveItem = (index: number, direction: -1 | 1) => {
+  const moveItem = (from: number, to: number) => {
     const items = [...day.items]
-    const [moved] = items.splice(index, 1)
-    items.splice(index + direction, 0, moved)
+    const [moved] = items.splice(from, 1)
+    items.splice(to, 0, moved)
     return saveItems(items)
   }
+  // Warm-ups go before the first non-warm-up item, everything else is appended
+  const buildItem = (exercise: Exercise, kind: PickerKind): PlanItem => {
+    if (kind === 'main') return { exerciseId: exercise.id, sets: DEFAULT_SETS, repMin: DEFAULT_REP_MIN, repMax: DEFAULT_REP_MAX, restSec: restDefault }
+    const rounds = kind === 'stretch' ? DEFAULT_STRETCH_ROUNDS : 1
+    return { exerciseId: exercise.id, sets: rounds, repMin: DEFAULT_PREP_SEC, repMax: DEFAULT_PREP_SEC, restSec: 0, phase: kind }
+  }
+  const insertItem = (item: PlanItem) => {
+    if (item.phase !== 'warmup') return saveItems([...day.items, item])
+    const firstOtherIndex = day.items.findIndex(existing => existing.phase !== 'warmup')
+    const insertAt = firstOtherIndex === -1 ? day.items.length : firstOtherIndex
+    return saveItems([...day.items.slice(0, insertAt), item, ...day.items.slice(insertAt)])
+  }
+  const { draggedIndex, setRowRef, getHandleProps, getRowStyle } = useDragReorder(day.items.length, moveItem)
 
   async function handleDelete (): Promise<void> {
     if (window.confirm(`Delete ${day.name}? Past workouts are kept.`)) await deletePlanDay(dayId)
   }
 
   return (
-    <section className="rounded-2xl bg-surface p-4">
+    <section className={`rounded-2xl border-l-4 bg-surface p-4 ${style.border}`}>
       <button className="flex min-h-11 w-full items-center justify-between text-left" onClick={() => setIsOpen(!isOpen)}>
         <span>
           <span className="block text-xs text-muted">Day {dayNumber}</span>
@@ -50,7 +76,7 @@ export const PlanDayCard = ({ day, dayNumber, exerciseMap, isEditing, restDefaul
         </span>
         <span className="text-right">
           <span className={`block text-sm font-semibold ${style.text}`}>{style.label}</span>
-          <span className="block text-xs text-muted">{day.items.length} ex · ~{estimateMinutes(day.items)} min</span>
+          <span className="block text-xs text-muted">{getMainItems(day.items).length} ex · ~{estimateMinutes(day.items)} min</span>
         </span>
       </button>
 
@@ -62,61 +88,56 @@ export const PlanDayCard = ({ day, dayNumber, exerciseMap, isEditing, restDefaul
             aria-label="Day name"
             onBlur={event => updatePlanDay(dayId, { name: event.target.value.trim() || day.name })}
           />
-          <select
-            className="min-h-11 rounded-xl border border-border bg-surface-2 px-2"
+          <Select
+            title="Day type"
+            className="w-28"
             value={day.type}
-            aria-label="Day type"
-            onChange={event => updatePlanDay(dayId, { type: event.target.value as DayType })}
-          >
-            {DAY_TYPES.map(type => <option key={type} value={type}>{DAY_TYPE_STYLES[type].label}</option>)}
-          </select>
+            options={DAY_TYPES.map(type => ({ value: type, label: DAY_TYPE_STYLES[type].label }))}
+            onChange={value => updatePlanDay(dayId, { type: value as DayType })}
+          />
         </div>
       )}
 
       {isExpanded && (
         <ul className="mt-3 flex flex-col gap-2">
-          {day.items.map((item, index) => {
-            const exercise = exerciseMap.get(item.exerciseId)
-            return (
-              <li key={item.exerciseId} className="rounded-xl bg-surface-2 p-2">
-                <div className="flex items-center gap-3">
-                  <ExerciseImage exercise={exercise} className="size-10 shrink-0 rounded-lg" />
-                  <span className="flex-1 text-sm">{exercise?.name ?? item.exerciseId}</span>
-                  {!isEditing && <span className="text-sm text-muted">{item.sets} × {formatRepRange(item)}</span>}
-                </div>
-                {isEditing && (
-                  <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted">
-                    <label className="flex items-center gap-1">Sets <NumberInput className="w-14" label="Sets" value={item.sets} onCommit={value => patchItem(index, { sets: value })} /></label>
-                    <label className="flex items-center gap-1">Reps <NumberInput className="w-14" label="Min reps" value={item.repMin} onCommit={value => patchItem(index, { repMin: value })} /></label>
-                    <label className="flex items-center gap-1">to <NumberInput className="w-14" label="Max reps" value={item.repMax} onCommit={value => patchItem(index, { repMax: value })} /></label>
-                    <label className="flex items-center gap-1">Rest s <NumberInput className="w-16" label="Rest seconds" value={item.restSec} onCommit={value => patchItem(index, { restSec: value })} /></label>
-                    <span className="ml-auto flex gap-1">
-                      <button className="min-h-11 min-w-11 rounded-lg bg-surface disabled:opacity-30" disabled={index === 0} onClick={() => moveItem(index, -1)} aria-label="Move up">↑</button>
-                      <button className="min-h-11 min-w-11 rounded-lg bg-surface disabled:opacity-30" disabled={index === day.items.length - 1} onClick={() => moveItem(index, 1)} aria-label="Move down">↓</button>
-                      <button className="min-h-11 min-w-11 rounded-lg bg-surface text-red-400" onClick={() => saveItems(day.items.filter((_, itemIndex) => itemIndex !== index))} aria-label="Remove">✕</button>
-                    </span>
-                  </div>
-                )}
-              </li>
-            )
-          })}
+          {day.items.map((item, index) => (
+            <PlanItemRow
+              key={item.exerciseId}
+              item={item}
+              exercise={exerciseMap.get(item.exerciseId)}
+              isEditing={isEditing}
+              isRestTimerEnabled={isRestTimerEnabled}
+              isDragged={draggedIndex === index}
+              style={getRowStyle(index)}
+              rowRef={setRowRef(index)}
+              handleProps={getHandleProps(index)}
+              onPatch={patch => patchItem(index, patch)}
+              onRemove={() => saveItems(day.items.filter((_, itemIndex) => itemIndex !== index))}
+            />
+          ))}
         </ul>
       )}
 
       {isEditing && (
-        <div className="mt-3 flex gap-2">
-          <button className="min-h-11 flex-1 rounded-xl border border-border text-sm" onClick={() => setIsPickerOpen(true)}>+ Add exercise</button>
-          <button className="min-h-11 rounded-xl px-4 text-sm text-red-400" onClick={handleDelete}>Delete day</button>
+        <div className="mt-3 flex flex-col gap-2">
+          <button className="min-h-11 rounded-xl border border-border text-sm" onClick={() => setPickerKind('main')}>+ Add exercise</button>
+          <div className="flex gap-2">
+            <button className="min-h-11 flex-1 rounded-xl bg-legs/15 text-sm text-legs" onClick={() => setPickerKind('warmup')}>+ Warm-up</button>
+            <button className="min-h-11 flex-1 rounded-xl bg-pull/15 text-sm text-pull" onClick={() => setPickerKind('stretch')}>+ Stretch</button>
+          </div>
+          <button className="min-h-11 rounded-xl text-sm text-red-400" onClick={handleDelete}>Delete day</button>
         </div>
       )}
 
-      {isPickerOpen && (
+      {pickerKind && (
         <ExercisePicker
+          title={PICKERS[pickerKind].title}
+          library={PICKERS[pickerKind].library}
           excludeIds={day.items.map(item => item.exerciseId)}
-          onClose={() => setIsPickerOpen(false)}
+          onClose={() => setPickerKind(null)}
           onPick={async exercise => {
-            setIsPickerOpen(false)
-            await saveItems([...day.items, { exerciseId: exercise.id, sets: DEFAULT_SETS, repMin: DEFAULT_REP_MIN, repMax: DEFAULT_REP_MAX, restSec: restDefault }])
+            setPickerKind(null)
+            await insertItem(buildItem(exercise, pickerKind))
           }}
         />
       )}

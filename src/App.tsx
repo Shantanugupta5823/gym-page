@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import { Plan } from '@/screens/Plan'
 import { Home } from '@/screens/Home'
 import { Progress } from '@/screens/Progress'
+import { ExerciseProgress } from '@/screens/ExerciseProgress'
 import { Workout } from '@/screens/Workout'
 import { Settings } from '@/screens/Settings'
 import { BottomNav } from '@/components/BottomNav'
@@ -13,6 +14,7 @@ export const App = () => (
       <Route path="/" element={<Home />} />
       <Route path="/workout" element={<Workout />} />
       <Route path="/progress" element={<Progress />} />
+      <Route path="/progress/:exerciseId" element={<ExerciseProgress />} />
       <Route path="/plan" element={<Plan />} />
       <Route path="/settings" element={<Settings />} />
     </Routes>

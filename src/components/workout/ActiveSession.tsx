@@ -7,6 +7,8 @@ import { DAY_TYPE_STYLES } from '@/lib/dayType'
 import { formatDuration } from '@/lib/dates'
 import { RestTimer } from '@/components/workout/RestTimer'
 import { ExercisePicker } from '@/components/ExercisePicker'
+import { CURATED_EXERCISES } from '@/db/curatedExercises'
+import { PrepCard } from '@/components/workout/PrepCard'
 import { ExerciseCard } from '@/components/workout/ExerciseCard'
 import { useExerciseMap, useWorkoutSets } from '@/db/queries'
 import { discardWorkout, finishWorkout, setWorkoutNotes, skipExercise, swapExercise } from '@/db/workouts'
@@ -31,7 +33,7 @@ const EXTRA_REST_SEC = 30
 export const ActiveSession = ({ workout }: ActiveSessionProps) => {
   const navigate = useNavigate()
   const now = useNow(TICK_MS)
-  const { unit, increment } = useSettings()
+  const { unit, increment, isRestTimerEnabled } = useSettings()
   const exerciseMap = useExerciseMap()
   const sets = useWorkoutSets(workout.id)
   const [pickedIndex, setPickedIndex] = useState<number | null>(null)
@@ -117,21 +119,30 @@ export const ActiveSession = ({ workout }: ActiveSessionProps) => {
         </div>
       </div>
 
-      {currentItem
-        ? (
-          <ExerciseCard
-            key={currentItem.exerciseId}
-            workoutId={workoutId}
-            item={currentItem}
-            exercise={exerciseMap.get(currentItem.exerciseId)}
-            sets={setsFor(currentItem.exerciseId)}
-            unit={unit}
-            increment={increment}
-            accentBg={style.bg}
-            onSetDone={() => setRest({ endsAt: Date.now() + currentItem.restSec * MS_PER_SECOND, totalSec: currentItem.restSec })}
-          />
-        )
-        : <p className="py-10 text-center text-muted">No exercises left. Tap Finish to save.</p>}
+      {currentItem?.phase && (
+        <PrepCard
+          key={currentItem.exerciseId}
+          item={currentItem}
+          phase={currentItem.phase}
+          exercise={exerciseMap.get(currentItem.exerciseId)}
+          sets={setsFor(currentItem.exerciseId)}
+          accentBg={style.bg}
+        />
+      )}
+      {currentItem && !currentItem.phase && (
+        <ExerciseCard
+          key={currentItem.exerciseId}
+          workoutId={workoutId}
+          item={currentItem}
+          exercise={exerciseMap.get(currentItem.exerciseId)}
+          sets={setsFor(currentItem.exerciseId)}
+          unit={unit}
+          increment={increment}
+          accentBg={style.bg}
+          onSetDone={() => isRestTimerEnabled && setRest({ endsAt: Date.now() + currentItem.restSec * MS_PER_SECOND, totalSec: currentItem.restSec })}
+        />
+    )}
+      {!currentItem && <p className="py-10 text-center text-muted">No exercises left. Tap Finish to save.</p>}
 
       <div className="flex gap-2">
         <button className="min-h-11 flex-1 rounded-xl bg-surface text-sm disabled:opacity-40" disabled={currentIndex === 0} onClick={() => setPickedIndex(currentIndex - 1)}>
@@ -148,7 +159,10 @@ export const ActiveSession = ({ workout }: ActiveSessionProps) => {
           {workout.items.map((item, index) => index === currentIndex ? null : (
             <li key={item.exerciseId}>
               <button className="flex min-h-12 w-full items-center justify-between rounded-xl bg-surface px-3 text-left text-sm" onClick={() => setPickedIndex(index)}>
-                <span className={isItemDone(item.exerciseId) ? 'text-muted line-through' : ''}>{exerciseMap.get(item.exerciseId)?.name ?? item.exerciseId}</span>
+                <span className={isItemDone(item.exerciseId) ? 'text-muted line-through' : ''}>
+                  {exerciseMap.get(item.exerciseId)?.name ?? item.exerciseId}
+                  {item.phase && <span className={`ml-2 text-xs ${item.phase === 'warmup' ? 'text-legs' : 'text-pull'}`}>{item.phase === 'warmup' ? 'warm-up' : 'stretch'}</span>}
+                </span>
                 <span className="text-xs text-muted">{setsFor(item.exerciseId).filter(set => set.done).length}/{setsFor(item.exerciseId).length}</span>
               </button>
             </li>
@@ -156,7 +170,7 @@ export const ActiveSession = ({ workout }: ActiveSessionProps) => {
         </ul>
       </section>
 
-      {rest && (
+      {isRestTimerEnabled && rest && (
         <RestTimer
           endsAt={rest.endsAt}
           totalSec={rest.totalSec}
@@ -180,6 +194,8 @@ export const ActiveSession = ({ workout }: ActiveSessionProps) => {
 
       {menuView === 'swap' && (
         <ExercisePicker
+          title="Exercise library"
+          library={CURATED_EXERCISES}
           excludeIds={workout.items.map(item => item.exerciseId)}
           onClose={() => setMenuView('closed')}
           onPick={async exercise => {

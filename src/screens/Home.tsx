@@ -10,7 +10,7 @@ import { StatTile } from '@/components/home/StatTile'
 import { MuscleBars } from '@/components/home/MuscleBars'
 import { toDisplayWeight } from '@/lib/units'
 import type { MuscleGroup } from '@/lib/muscles'
-import { formatLongDate, formatShortDate, getGreeting, startOfWeek } from '@/lib/dates'
+import { formatLongDate, formatMinutes, formatShortDate, getGreeting, startOfWeek } from '@/lib/dates'
 import { useDoneSets, useExerciseMap, useFinishedWorkouts } from '@/db/queries'
 
 const RECENT_PR_COUNT = 3
@@ -30,6 +30,8 @@ export const Home = () => {
   const weekSets = doneSets.filter(set => set.createdAt >= weekStart)
   const weekWorkouts = workouts.filter(workout => (workout.endedAt ?? 0) >= weekStart)
   const volumeTonnes = weekSets.reduce((sum, set) => sum + set.weight * set.reps, 0) / KG_PER_TONNE
+  const weekTimeMs = weekWorkouts.reduce((sum, workout) => sum + (workout.endedAt ?? workout.startedAt) - workout.startedAt, 0)
+  const averageMs = weekWorkouts.length > 0 ? weekTimeMs / weekWorkouts.length : 0
   const streak = getStreak(workouts.map(workout => workout.endedAt ?? 0), now)
 
   const muscleCounts = new Map<MuscleGroup, number>()
@@ -55,10 +57,11 @@ export const Home = () => {
       <TodayCard />
       <WeekStrip workouts={workouts} now={now} />
 
-      <section className="flex gap-3">
+      <section className="grid grid-cols-2 gap-3">
         <StatTile label="Streak" value={String(streak)} hint={streak === 1 ? 'workout' : 'workouts'} />
         <StatTile label="This week" value={`${weekWorkouts.length}/${settings.weeklyTarget}`} hint="workouts" />
         <StatTile label="Volume" value={volumeTonnes.toFixed(1)} hint="tonnes" />
+        <StatTile label="Time trained" value={formatMinutes(weekTimeMs)} hint={weekWorkouts.length > 0 ? `${formatMinutes(averageMs)} per workout` : 'this week'} />
       </section>
 
       <MuscleBars counts={muscleCounts} />

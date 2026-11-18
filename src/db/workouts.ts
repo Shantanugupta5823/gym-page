@@ -51,7 +51,7 @@ export async function startWorkout (day: PlanDay, increment: number): Promise<nu
       items: day.items,
       startedAt: Date.now()
     })
-    const lastSessions = await Promise.all(day.items.map(item => getLastSession(item.exerciseId, workoutId)))
+    const lastSessions = await Promise.all(day.items.map(async item => (item.phase ? [] : getLastSession(item.exerciseId, workoutId))))
     const rows = day.items.flatMap((item, index) => {
       return buildSetRows({ workoutId, item, lastSets: lastSessions[index], increment, startIndex: 0, count: item.sets })
     })

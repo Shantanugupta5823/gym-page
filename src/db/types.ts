@@ -13,16 +13,26 @@ export interface Exercise {
   instructions: string[]
 }
 
+// Warm-up and stretch items are timed: sets are rounds and repMin/repMax hold the seconds
+export type ItemPhase = 'warmup' | 'stretch'
+
 export interface PlanItem {
   exerciseId: string
   sets: number
   repMin: number
   repMax: number
   restSec: number
+  phase?: ItemPhase
+}
+
+export interface Plan {
+  id?: number
+  name: string
 }
 
 export interface PlanDay {
   id?: number
+  planId: number
   order: number
   name: string
   type: DayType
@@ -51,15 +61,11 @@ export interface WorkoutSet {
   createdAt: number
 }
 
-export interface BodyweightEntry {
-  id?: number
-  date: number
-  kg: number
-}
-
 export interface Settings {
   unit: Unit
   rotationMode: RotationMode
+  activePlanId: number
+  isRestTimerEnabled: boolean
   restDefault: number
   increment: number
   weeklyTarget: number
@@ -72,10 +78,10 @@ export interface SettingRow {
 }
 
 export interface BackupFile {
-  version: 1
+  version: 2
+  plans: Plan[]
   planDays: PlanDay[]
   workouts: Workout[]
   sets: WorkoutSet[]
-  bodyweight: BodyweightEntry[]
   settings: SettingRow[]
 }

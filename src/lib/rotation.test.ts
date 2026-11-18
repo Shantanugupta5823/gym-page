@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { getNextRollingDay, getTodayDay } from '@/lib/rotation'
 import type { PlanDay, Workout } from '@/db/types'
 
-const days: PlanDay[] = [1, 2, 3].map(id => ({ id, order: id, name: `Day ${id}`, type: 'push', items: [] }))
+const days: PlanDay[] = [1, 2, 3].map(id => ({ id, planId: 1, order: id, name: `Day ${id}`, type: 'push', items: [] }))
 
 function done (planDayId: number, endedAt: number): Workout {
   return { id: endedAt, planDayId, dayName: '', dayType: 'push', items: [], startedAt: endedAt - 1, endedAt }

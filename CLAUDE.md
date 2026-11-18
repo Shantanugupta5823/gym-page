@@ -47,14 +47,13 @@ It has no backend: all data lives on the device in IndexedDB. It is hosted free 
    - Est. 1RM line chart (Epley: `w × (1 + reps/30)`), range 1M / 3M / 1Y
    - PR tiles: heaviest weight, best set (e1RM), best session volume
    - Session history list for that exercise
-   - Bodyweight chart, entered from a small "+ log weight" sheet
 4. **Plan**
    - Rotation mode: **Rolling** (the next day is whatever comes after the last completed day; the default) or **Fixed weekdays**
    - Day cards (Day 1–6). Expanding a card shows its exercises with sets × reps
    - Edit mode: reorder or add/remove exercises (searchable exercise library with images), change sets/reps/rest
 5. **Settings** (open from Plan or a gear icon)
    - Units (kg/lb), default rest time, kg increment (2.5)
-   - **Export JSON**, **Import JSON**, and reset data
+   - **Export JSON**, **Import JSON**, and **Reset data**: pick any of workout history / plan / settings, or reset everything
 
 ## Data model (Dexie)
 ```ts
@@ -62,29 +61,26 @@ exercises:  id, name, primaryMuscles[], secondaryMuscles[], equipment, category,
 planDays:   id, order, name, type ('push'|'pull'|'legs'), items: { exerciseId, sets, repMin, repMax, restSec }[]
 workouts:   id, planDayId, startedAt, endedAt?, notes?
 sets:       id, workoutId, exerciseId, setIndex, weight, reps, done, createdAt   // index [exerciseId+createdAt]
-bodyweight: id, date, kg
 settings:   key/value (unit, rotationMode, restDefault, increment)
 ```
 
 ## Progression hint (double progression)
 If every working set of an exercise last session hit `repMax`, show a "↑ try +2.5 kg" chip and prefill the weight +increment. Otherwise prefill the same weight.
 
-## Seed plan: PPL × 2 (I will edit this to my exact plan)
-- **Push A**: Barbell Bench Press 4×5–8, Incline DB Press 3×8–10, Overhead Press 3×6–8, Lateral Raise 3×12–15, Cable Fly 3×12, Tricep Pushdown 3×10–12
-- **Pull A**: Deadlift 3×3–5, Barbell Row 4×6–8, Lat Pulldown 3×8–10, Face Pull 3×15, Barbell Curl 3×8–10, Hammer Curl 3×10–12
-- **Legs A**: Back Squat 4×5–8, Romanian Deadlift 3×8–10, Leg Press 3×10–12, Leg Curl 3×10–12, Standing Calf Raise 4×10–15, Hanging Leg Raise 3×12
-- **Push B**: Overhead Press 4×5–8, Incline Barbell Bench 3×8–10, Dips 3×8–12, Cable Lateral Raise 3×12–15, Pec Deck 3×12–15, Overhead Tricep Extension 3×10–12
-- **Pull B**: Pull-ups 4×6–10, Seated Cable Row 3×8–12, Single-arm DB Row 3×10, Reverse Fly 3×15, Incline DB Curl 3×10–12, Shrugs 3×12
-- **Legs B**: Hack Squat 4×8–10, Bulgarian Split Squat 3×10, Leg Extension 3×12–15, Lying Leg Curl 3×12, Hip Thrust 3×10, Seated Calf Raise 4×15
+## Seed plan: my PPL split (muscle focus per day; editable in the Plan tab)
+Rolling rotation follows completed workouts, not weekdays. Each muscle gets 3-5 exercises per day (11-13 per day), 2-3 sets each. Rep ranges by load: heavy 8-12, medium 12-15, light 15-20.
+1. **Push A**: Chest, Triceps, Forearms
+2. **Pull A**: Back, Biceps, Abs
+3. **Legs A**: Quads, Shoulders, Forearms
+4. **Push B**: Chest, Triceps, Abs
+5. **Pull B**: Back, Biceps, Forearms
+6. **Legs B**: Hamstrings, Calves, Shoulders, Abs
+Exact exercises live in `src/db/seedPlan.ts`.
 
-## Exercise images
-- Use the open-source **free-exercise-db** dataset (github.com/yuhonas/free-exercise-db): `exercises.json` plus images per exercise. Check its licence and file layout before using it.
-- Write a build-time script (`scripts/fetch-exercises.ts`) that does three things:
-  1. Download the JSON.
-  2. Map the seed exercises above to dataset IDs.
-  3. Copy only the needed images (plus the full JSON for the library search) into `public/exercises/`.
-- Images are then served from our own origin and precached by the service worker, so they work offline.
-- For exercises not in the dataset, fall back to a neutral placeholder.
+## Exercise library
+- Curated, at most 20 per muscle group (11 groups incl. Forearms), in `src/db/curatedExercises.ts`. Glutes and hamstrings have fewer because the dataset has few good options.
+- Source: **free-exercise-db** (Unlicense). `npm run fetch-exercises` downloads the JSON, keeps only curated exercises, and copies only the first image of each into `public/exercises/`, so images are served from our origin and precached.
+- Bodyweight tracking was removed on purpose (the Dr Trust 360 app is used instead; it has no data we can read).
 
 ## PWA requirements
 - `manifest`: name "Gym Log", short_name "Gym", `display: standalone`, theme/background `#0B0B0C`, 192 and 512 icons plus a maskable icon. `start_url` and `scope` must respect the Vite `base`.

@@ -1,5 +1,6 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { SEED_PLAN } from '../src/db/seedPlan.ts'
+import { CURATED_EXERCISES, PREP_EXERCISE_IDS } from '../src/db/curatedExercises.ts'
 
 const RAW_BASE = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main'
 const OUTPUT_DIR = 'public/exercises'
@@ -29,18 +30,30 @@ const jsonResponse = await fetchWithRetry(`${RAW_BASE}/dist/exercises.json`)
 const exercises = await jsonResponse.json() as DatasetExercise[]
 const exerciseById = new Map(exercises.map(exercise => [exercise.id, exercise]))
 
-const neededIds = [...new Set(SEED_PLAN.flatMap(day => day.items.map(item => item.exerciseId)))]
-const missingIds = neededIds.filter(id => !exerciseById.has(id))
-if (missingIds.length > 0) throw new Error(`Seed exercises missing from dataset: ${missingIds.join(', ')}`)
+const curatedIds = [...new Set([...Object.values(CURATED_EXERCISES).flat(), ...PREP_EXERCISE_IDS])]
+const seedIds = SEED_PLAN.flatMap(day => day.items.map(item => item.exerciseId))
 
+const missingIds = curatedIds.filter(id => !exerciseById.has(id))
+if (missingIds.length > 0) throw new Error(`Curated exercises missing from dataset: ${missingIds.join(', ')}`)
+const uncuratedSeedIds = seedIds.filter(id => !curatedIds.includes(id))
+if (uncuratedSeedIds.length > 0) throw new Error(`Seed plan uses uncurated exercises: ${uncuratedSeedIds.join(', ')}`)
+
+// The app shows only the first image, so only that one is shipped
+const library = curatedIds.map(id => {
+  const exercise = exerciseById.get(id) as DatasetExercise
+  return { ...exercise, images: exercise.images.slice(0, 1) }
+})
+
+await rm(OUTPUT_DIR, { recursive: true, force: true })
 await mkdir(`${OUTPUT_DIR}/images`, { recursive: true })
-await writeFile(`${OUTPUT_DIR}/exercises.json`, JSON.stringify(exercises))
+await writeFile(`${OUTPUT_DIR}/exercises.json`, JSON.stringify(library))
 
-const imagePaths = neededIds.flatMap(id => exerciseById.get(id)?.images ?? [])
-for (const imagePath of imagePaths) {
-  const imageResponse = await fetchWithRetry(`${RAW_BASE}/exercises/${imagePath}`)
-  await mkdir(`${OUTPUT_DIR}/images/${imagePath.split('/')[0]}`, { recursive: true })
-  await writeFile(`${OUTPUT_DIR}/images/${imagePath}`, Buffer.from(await imageResponse.arrayBuffer()))
+for (const exercise of library) {
+  for (const imagePath of exercise.images) {
+    const imageResponse = await fetchWithRetry(`${RAW_BASE}/exercises/${imagePath}`)
+    await mkdir(`${OUTPUT_DIR}/images/${imagePath.split('/')[0]}`, { recursive: true })
+    await writeFile(`${OUTPUT_DIR}/images/${imagePath}`, Buffer.from(await imageResponse.arrayBuffer()))
+  }
 }
 
-console.log(`Wrote ${exercises.length} exercises and ${imagePaths.length} images to ${OUTPUT_DIR}`)
+console.log(`Wrote ${library.length} exercises to ${OUTPUT_DIR}`)
