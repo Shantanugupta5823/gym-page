@@ -1,0 +1,18 @@
+import { Route, Routes } from 'react-router-dom'
+import { Plan } from '@/screens/Plan'
+import { Home } from '@/screens/Home'
+import { Progress } from '@/screens/Progress'
+import { Workout } from '@/screens/Workout'
+import { BottomNav } from '@/components/BottomNav'
+
+export const App = () => (
+  <div className="mx-auto min-h-dvh max-w-md pb-24">
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/workout" element={<Workout />} />
+      <Route path="/progress" element={<Progress />} />
+      <Route path="/plan" element={<Plan />} />
+    </Routes>
+    <BottomNav />
+  </div>
+)
