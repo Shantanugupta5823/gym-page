@@ -92,7 +92,7 @@ If every working set of an exercise last session hit `repMax`, show a "↑ try +
 - Call `navigator.storage.persist()` on first run, so the browser is less likely to evict the data.
 
 ## Deployment (GitHub Pages)
-- In `vite.config.ts`, set `base: '/gym-log/'` (the repo name).
+- In `vite.config.ts`, set `base: '/gym-page/'` (the repo name).
 - Add a GitHub Actions workflow `.github/workflows/deploy.yml`: on push to `main` → `npm ci` → `npm run build` → `actions/upload-pages-artifact` (dist) → `actions/deploy-pages`.
 - In repo Settings → Pages → Source, choose **GitHub Actions**.
 
