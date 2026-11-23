@@ -4,12 +4,10 @@ import { findPrs } from '@/lib/records'
 import { useSettings } from '@/db/settings'
 import { TodayCard } from '@/components/TodayCard'
 import { useNow } from '@/lib/useNow'
-import { getMuscleGroup } from '@/lib/muscles'
 import { WeekStrip } from '@/components/home/WeekStrip'
 import { StatTile } from '@/components/home/StatTile'
-import { MuscleBars } from '@/components/home/MuscleBars'
+import { RotationCard } from '@/components/home/RotationCard'
 import { toDisplayWeight } from '@/lib/units'
-import type { MuscleGroup } from '@/lib/muscles'
 import { formatLongDate, formatMinutes, formatShortDate, getGreeting, startOfWeek } from '@/lib/dates'
 import { useDoneSets, useExerciseMap, useFinishedWorkouts } from '@/db/queries'
 
@@ -34,14 +32,6 @@ export const Home = () => {
   const averageMs = weekWorkouts.length > 0 ? weekTimeMs / weekWorkouts.length : 0
   const streak = getStreak(workouts.map(workout => workout.endedAt ?? 0), now)
 
-  const muscleCounts = new Map<MuscleGroup, number>()
-  weekSets.forEach(set => {
-    const groups = new Set(exerciseMap.get(set.exerciseId)?.primaryMuscles.map(getMuscleGroup))
-    groups.forEach(group => {
-      if (group) muscleCounts.set(group, (muscleCounts.get(group) ?? 0) + 1)
-    })
-  })
-
   const recentPrs = findPrs(doneSets).slice(0, RECENT_PR_COUNT)
 
   return (
@@ -55,6 +45,7 @@ export const Home = () => {
       </header>
 
       <TodayCard />
+      <RotationCard />
       <WeekStrip workouts={workouts} now={now} />
 
       <section className="grid grid-cols-2 gap-3">
@@ -63,8 +54,6 @@ export const Home = () => {
         <StatTile label="Volume" value={volumeTonnes.toFixed(1)} hint="tonnes" />
         <StatTile label="Time trained" value={formatMinutes(weekTimeMs)} hint={weekWorkouts.length > 0 ? `${formatMinutes(averageMs)} per workout` : 'this week'} />
       </section>
-
-      <MuscleBars counts={muscleCounts} />
 
       <section className="rounded-2xl bg-surface p-4">
         <h2 className="mb-3 font-heading text-base font-semibold">Recent PRs</h2>

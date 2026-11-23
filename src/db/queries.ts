@@ -43,3 +43,16 @@ export function useExerciseMap (): Map<string, Exercise> {
   const exercises = useExercises()
   return new Map((exercises ?? []).map(exercise => [exercise.id, exercise]))
 }
+
+// Finished workouts plus the one in progress, oldest first
+export function useAllWorkouts (): Workout[] | undefined {
+  return useLiveQuery(() => db.workouts.orderBy('startedAt').toArray(), [])
+}
+
+export function useSetsForWorkouts (workoutIds: number[]): WorkoutSet[] | undefined {
+  const key = workoutIds.join(',')
+  return useLiveQuery(
+    () => db.sets.where('workoutId').anyOf(workoutIds).filter(set => set.done && !PREP_EXERCISE_IDS.has(set.exerciseId)).toArray(),
+    [key]
+  )
+}

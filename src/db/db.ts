@@ -49,6 +49,10 @@ class GymDb extends Dexie {
       await transaction.table('planDays').toCollection().modify({ planId })
       await transaction.table('settings').put({ key: 'activePlanId', value: planId })
     })
+    // The rotation redesign starts fresh: new library (neck, traps, adductors...), the four-day plan, empty history
+    this.version(7).upgrade(async transaction => {
+      await Promise.all(['exercises', 'plans', 'planDays', 'workouts', 'sets', 'settings'].map(name => transaction.table(name).clear()))
+    })
   }
 }
 

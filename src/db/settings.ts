@@ -10,7 +10,7 @@ export const DEFAULT_SETTINGS: Settings = {
   isRestTimerEnabled: true,
   restDefault: 90,
   increment: 2.5,
-  weeklyTarget: 6,
+  weeklyTarget: 7,
   weekdayPlan: {}
 }
 

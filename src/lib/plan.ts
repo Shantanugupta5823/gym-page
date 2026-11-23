@@ -1,4 +1,4 @@
-import { getMuscleGroup } from '@/lib/muscles'
+import { getMuscleCredits, MUSCLE_GROUPS } from '@/lib/muscles'
 import type { Exercise, PlanItem } from '@/db/types'
 
 const SET_WORK_SEC = 40
@@ -29,8 +29,11 @@ export function formatRepRange (item: PlanItem): string {
 }
 
 export function getDayMuscles (items: PlanItem[], exerciseMap: Map<string, Exercise>): string[] {
-  const groups = getMainItems(items).flatMap(item => exerciseMap.get(item.exerciseId)?.primaryMuscles ?? []).map(getMuscleGroup)
-  return [...new Set(groups.filter(group => group !== null))]
+  const trained = new Set(getMainItems(items).flatMap(item => {
+    const exercise = exerciseMap.get(item.exerciseId)
+    return exercise ? Object.entries(getMuscleCredits(exercise)).filter(([, credit]) => (credit ?? 0) >= 1).map(([group]) => group) : []
+  }))
+  return MUSCLE_GROUPS.filter(group => trained.has(group))
 }
 
 export function capitalize (text: string): string {

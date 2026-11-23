@@ -1,4 +1,4 @@
-import { getMuscleGroup } from '@/lib/muscles'
+import { getPrimaryGroup } from '@/lib/muscles'
 import { summarizeSessions } from '@/lib/sessions'
 import type { MuscleGroup } from '@/lib/muscles'
 import type { Exercise, WorkoutSet } from '@/db/types'
@@ -53,7 +53,7 @@ export function buildGroupTrends (sets: WorkoutSet[], exerciseMap: Map<string, E
 
   const groups = new Map<MuscleGroup, ExerciseTrend[]>()
   setsByExercise.forEach((exerciseSets, exerciseId) => {
-    const group = (exerciseMap.get(exerciseId)?.primaryMuscles ?? []).map(getMuscleGroup).find(item => item !== null)
+    const group = getPrimaryGroup(exerciseMap.get(exerciseId))
     if (!group) return
     groups.set(group, [...(groups.get(group) ?? []), buildTrend(exerciseId, exerciseSets, rangeStart)])
   })

@@ -1,10 +1,10 @@
-# Gym Log — PPL workout tracker (PWA)
+# Gym Log — rotation workout tracker (PWA)
 
 A personal, mobile-first gym tracker that runs as an installable PWA on my phone.
 It has no backend: all data lives on the device in IndexedDB. It is hosted free on GitHub Pages.
 
 ## Goals
-- Open the app at the gym, tap **Start workout**, and the right PPL day is already loaded with last session's numbers.
+- Open the app at the gym, tap **Start workout**, and the next rotation day is already loaded with last session's numbers.
 - Logging a set takes 2 taps: the inputs are prefilled from last time, and I tap ✓.
 - A simple dashboard shows what I've done this week and whether I'm progressing.
 - It works fully offline once installed.
@@ -21,7 +21,8 @@ It has no backend: all data lives on the device in IndexedDB. It is hosted free 
 ## Design tokens (match the mockup)
 - Background `#0B0B0C`, surface `#17171A`, surface-2 `#222226`, border `#1F1F23`
 - Text `#F4F4F5`, muted `#A1A1AA`
-- Accent / Push `#A3E635` (lime), Pull `#7DD3FC` (sky), Legs `#FB923C` (orange)
+- Accent / Push `#A3E635` (lime), Pull `#7DD3FC` (sky), Legs `#FB923C` (orange), Delts & Arms `#C4B5FD` (violet)
+- Body map coverage: grey `#2C2C33` → dark green → `#4ADE80` (done)
 - Fonts: Space Grotesk for headings and big numbers, Inter for body text
 - Radii: cards 16–20px, inputs and buttons 10–14px. Touch targets ≥ 44px
 - Bottom nav with 4 tabs: Home, Workout, Progress, Plan
@@ -29,10 +30,13 @@ It has no backend: all data lives on the device in IndexedDB. It is hosted free 
 ## Screens
 1. **Home / Dashboard**
    - Greeting and date
-   - "Today" card with the next PPL day name, its muscles, exercise count, estimated time, and a **Start workout** button
-   - Week strip (Mon–Sun) showing done, today and upcoming days, colour-coded by Push/Pull/Legs
+   - "Today" card with the next rotation day ("Day N of 4") name, its muscles, exercise count, estimated time, and a **Start workout** button
+   - **Rotation card**: day pills (done ✓ / next / upcoming) and the **body map**: a male figure you drag to turn 180° (front ↔ back) or flip with Turn.
+     Each of the 17 muscles fills from grey through dark green to bright green as this rotation's sets are ticked off; the next workout's muscles are outlined in its day colour.
+     Tap a muscle for done/target sets and the days that train it; "Show all muscles" lists every bar.
+     A rotation starts whenever Day 1 is started (`src/lib/coverage.ts`). Target = the plan's sets for the muscle, done = ticked sets; primary movers count 1, secondary 0.5 (`getMuscleCredits` in `src/lib/muscles.ts`)
+   - Week strip (Mon–Sun) showing done, today and upcoming days, colour-coded by day type
    - Stat tiles: current streak, workouts this week / planned, total volume this week (tonnes)
-   - "Sets per muscle this week" horizontal bars, with a target band of 10–20 sets
    - Recent PRs (last 3)
 2. **Workout (active session)**
    - Header: day name, elapsed timer, "Exercise N of M" segmented progress bar, **Finish** button
@@ -58,7 +62,7 @@ It has no backend: all data lives on the device in IndexedDB. It is hosted free 
 ## Data model (Dexie)
 ```ts
 exercises:  id, name, primaryMuscles[], secondaryMuscles[], equipment, category, images[], instructions[]
-planDays:   id, order, name, type ('push'|'pull'|'legs'), items: { exerciseId, sets, repMin, repMax, restSec }[]
+planDays:   id, planId, order, name, type ('push'|'pull'|'legs'|'arms'), items: { exerciseId, sets, repMin, repMax, restSec }[]
 workouts:   id, planDayId, startedAt, endedAt?, notes?
 sets:       id, workoutId, exerciseId, setIndex, weight, reps, done, createdAt   // index [exerciseId+createdAt]
 settings:   key/value (unit, rotationMode, restDefault, increment)
@@ -67,18 +71,17 @@ settings:   key/value (unit, rotationMode, restDefault, increment)
 ## Progression hint (double progression)
 If every working set of an exercise last session hit `repMax`, show a "↑ try +2.5 kg" chip and prefill the weight +increment. Otherwise prefill the same weight.
 
-## Seed plan: my PPL split (muscle focus per day; editable in the Plan tab)
-Rolling rotation follows completed workouts, not weekdays. Each muscle gets 3-5 exercises per day (11-13 per day), 2-3 sets each. Rep ranges by load: heavy 8-12, medium 12-15, light 15-20.
-1. **Push A**: Chest, Triceps, Forearms
-2. **Pull A**: Back, Biceps, Abs
-3. **Legs A**: Quads, Shoulders, Forearms
-4. **Push B**: Chest, Triceps, Abs
-5. **Pull B**: Back, Biceps, Forearms
-6. **Legs B**: Hamstrings, Calves, Shoulders, Abs
-Exact exercises live in `src/db/seedPlan.ts`.
+## Seed plan: four-day rotation (editable in the Plan tab)
+Trained every day, on rotation (not weekdays). Goal: aesthetics plus strength, every body-map muscle (neck included) at least once per rotation; delts, arms, back width, core and neck twice.
+Each day opens with one heavy lift (4 × 5–8, 3 min rest), then compounds 8–12, isolation 10–15 and pump work 12–20. 8–10 exercises, about 75–90 min with warm-up and stretches.
+1. **Push**: Chest, Shoulders, Triceps, Neck (flexion)
+2. **Pull**: Back, Rear delts, Traps, Biceps, Forearms, Neck (extension)
+3. **Legs**: Quads, Hamstrings, Glutes, Adductors, Calves, Abs
+4. **Delts & Arms**: Shoulders, Rear delts, Back (chin-ups), Biceps, Triceps, Forearms, Abs, Obliques, Neck (sides)
+Exact exercises live in `src/db/seedPlan.ts`. The DB v7 upgrade wiped all data for this redesign (fresh start).
 
 ## Exercise library
-- Curated, at most 20 per muscle group (11 groups incl. Forearms), in `src/db/curatedExercises.ts`. Glutes and hamstrings have fewer because the dataset has few good options.
+- Curated, at most 20 per muscle, one list per body-map muscle (17: Neck, Traps, Shoulders, Rear delts, Chest, Back, Lower back, Biceps, Triceps, Forearms, Abs, Obliques, Glutes, Quads, Hamstrings, Adductors, Calves) in `src/db/curatedExercises.ts`.
 - Source: **free-exercise-db** (Unlicense). `npm run fetch-exercises` downloads the JSON, keeps only curated exercises, and copies only the first image of each into `public/exercises/`, so images are served from our origin and precached.
 - Bodyweight tracking was removed on purpose (the Dr Trust 360 app is used instead; it has no data we can read).
 
@@ -104,4 +107,6 @@ Exact exercises live in `src/db/seedPlan.ts`.
 ## Conventions
 - Small components and a `src/db/` folder for all Dexie access (no DB calls inside components except via hooks).
 - Keep all date math in one `src/lib/dates.ts`.
-- Unit-test the pure logic (next-day rotation, e1RM, PR detection, progression hint) with Vitest.
+- Unit-test the pure logic (next-day rotation, rotation coverage, e1RM, PR detection, progression hint) with Vitest.
+- `PREVIEW=1 npx vite build` makes a relative-path build without the service worker, for hosting a preview outside Pages.
+- Body map outlines come from react-body-highlighter (MIT), see `src/components/body/bodyRegions.ts`.

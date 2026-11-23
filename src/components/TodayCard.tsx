@@ -49,12 +49,13 @@ export const TodayCard = () => {
   }
 
   const style = DAY_TYPE_STYLES[dayToStart.type]
+  const dayNumber = [...planDays].sort((a, b) => a.order - b.order).findIndex(planDay => planDay.id === dayToStart.id) + 1
   const muscles = getDayMuscles(dayToStart.items, exerciseMap)
 
   return (
     <section className="rounded-3xl border border-border bg-surface p-5">
       <p className={`text-xs font-semibold uppercase tracking-wider ${style.text}`}>
-        {isRestDay ? 'Rest day · or train anyway' : 'Next up'} · {style.label}
+        {isRestDay ? 'Rest day · or train anyway' : 'Next up'} · Day {dayNumber} of {planDays.length}
       </p>
       <h2 className="mt-1 font-heading text-2xl font-semibold">{dayToStart.name}</h2>
       <p className="mt-1 text-sm text-muted">{muscles.join(' · ')}</p>

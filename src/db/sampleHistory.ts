@@ -3,17 +3,17 @@ import { getActivePlanDays } from '@/db/plans'
 import { DAY_MS } from '@/lib/dates'
 import type { WorkoutSet } from '@/db/types'
 
-const SAMPLE_WORKOUT_COUNT = 18
-const SPAN_DAYS = 40
-const DAYS_BETWEEN_WORKOUTS = 2.2
+// Three full rotations plus half of the current one, one workout a day
+const SAMPLE_WORKOUT_COUNT = 14
+const SPAN_DAYS = 14
+const DAYS_BETWEEN_WORKOUTS = 1
 const START_HOUR_MS = 18 * 3_600_000
-const SESSION_MS = 55 * 60_000
+const SESSION_MS = 80 * 60_000
 const SET_GAP_MS = 90_000
-const COMPOUND_REST_SEC = 150
+const COMPOUND_REST_SEC = 120
 const COMPOUND_BASE_KG = 60
 const ISOLATION_BASE_KG = 15
 const WEIGHT_STEP_KG = 2.5
-const PLAN_DAYS_PER_CYCLE = 6
 
 // Adds workouts that walk the plan in order, with weight rising each cycle so charts, PRs and the +kg hint show up
 export async function loadSampleHistory (): Promise<number> {
@@ -26,8 +26,8 @@ export async function loadSampleHistory (): Promise<number> {
   await db.transaction('rw', db.workouts, db.sets, async () => {
     for (let index = 0; index < SAMPLE_WORKOUT_COUNT; index++) {
       const day = planDays[index % planDays.length]
-      const cycle = Math.floor(index / PLAN_DAYS_PER_CYCLE)
-      const isLatestCycle = cycle === Math.floor((SAMPLE_WORKOUT_COUNT - 1) / PLAN_DAYS_PER_CYCLE)
+      const cycle = Math.floor(index / planDays.length)
+      const isLatestCycle = cycle === Math.floor((SAMPLE_WORKOUT_COUNT - 1) / planDays.length)
       const daysAgo = SPAN_DAYS - Math.round(index * DAYS_BETWEEN_WORKOUTS)
       const startedAt = today.getTime() - daysAgo * DAY_MS + START_HOUR_MS
 
