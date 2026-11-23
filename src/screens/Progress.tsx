@@ -78,7 +78,7 @@ export const Progress = () => {
             <ul className="flex flex-col gap-3">
               {visibleTrends.map(trend => {
                 const exercise = exerciseMap.get(trend.exerciseId)
-                const style = DAY_TYPE_STYLES[getExerciseDayType(exercise?.primaryMuscles ?? [])]
+                const style = DAY_TYPE_STYLES[getExerciseDayType(exercise)]
                 const points = trend.points.map(point => ({ date: point.date, value: toDisplayWeight(point.value, unit) }))
                 const isUp = (trend.changeE1rm ?? 0) >= 0
                 return (

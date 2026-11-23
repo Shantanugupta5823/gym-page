@@ -29,7 +29,7 @@ export const ExerciseProgress = () => {
   if (!doneSets) return null
 
   const exercise = exerciseMap.get(exerciseId)
-  const style = DAY_TYPE_STYLES[getExerciseDayType(exercise?.primaryMuscles ?? [])]
+  const style = DAY_TYPE_STYLES[getExerciseDayType(exercise)]
   const exerciseSets = doneSets.filter(set => set.exerciseId === exerciseId)
   const records = getExerciseRecords(exerciseSets)
   const rangeStart = Date.now() - rangeDays * DAY_MS

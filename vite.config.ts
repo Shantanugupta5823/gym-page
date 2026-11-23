@@ -4,7 +4,9 @@ import { VitePWA } from 'vite-plugin-pwa'
 import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath, URL } from 'node:url'
 
-const BASE = '/gym-page/'
+// PREVIEW=1 builds a relative-path copy without the service worker, for hosting a preview anywhere
+const IS_PREVIEW = process.env.PREVIEW === '1'
+const BASE = IS_PREVIEW ? './' : '/gym-page/'
 const THEME_COLOR = '#0B0B0C'
 const MAX_PRECACHE_BYTES = 3 * 1024 * 1024
 
@@ -14,6 +16,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      disable: IS_PREVIEW,
       registerType: 'prompt',
       includeAssets: ['icons/apple-touch-icon.png'],
       manifest: {

@@ -1,4 +1,5 @@
 import { ImportFileError } from '@/lib/errors'
+import { DAY_TYPES } from '@/lib/dayType'
 import type { DayType, ItemPhase, PlanItem } from '@/db/types'
 
 export interface PlanFileDay {
@@ -14,17 +15,16 @@ export interface PlanFile {
 }
 
 const PLAN_FILE_VERSION = 1
-const DAY_TYPES: DayType[] = ['push', 'pull', 'legs']
 const ITEM_PHASES: ItemPhase[] = ['warmup', 'stretch']
 const MAIN_NUMBER_FIELDS = ['sets', 'repMin', 'repMax', 'restSec'] as const
 const PREP_NUMBER_FIELDS = ['sets', 'repMin', 'repMax'] as const
 
 export const PLAN_TEMPLATE: PlanFile = {
   version: PLAN_FILE_VERSION,
-  name: 'Push Pull Legs',
+  name: 'Four-day rotation',
   days: [
     {
-      name: 'Push A',
+      name: 'Push',
       type: 'push',
       items: [
         { exerciseId: 'Arm_Circles', sets: 1, repMin: 30, repMax: 30, restSec: 0, phase: 'warmup' },
@@ -59,7 +59,7 @@ export function parsePlanFile (text: string, knownExerciseIds: Set<string>): Pla
     const where = `Day ${dayIndex + 1}`
     if (!isRecord(rawDay)) throw new ImportFileError(`${where} must be an object`)
     if (typeof rawDay.name !== 'string' || rawDay.name.trim() === '') throw new ImportFileError(`${where}: "name" is required`)
-    if (!DAY_TYPES.includes(rawDay.type as DayType)) throw new ImportFileError(`${where}: "type" must be push, pull or legs`)
+    if (!DAY_TYPES.includes(rawDay.type as DayType)) throw new ImportFileError(`${where}: "type" must be push, pull, legs or arms`)
     if (!Array.isArray(rawDay.items) || rawDay.items.length === 0) throw new ImportFileError(`${where}: "items" must be a non-empty list`)
 
     const items = rawDay.items.map((rawItem: unknown, itemIndex: number): PlanItem => {

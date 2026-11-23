@@ -1,4 +1,4 @@
-export type DayType = 'push' | 'pull' | 'legs'
+export type DayType = 'push' | 'pull' | 'legs' | 'arms'
 export type Unit = 'kg' | 'lb'
 export type RotationMode = 'rolling' | 'fixed'
 

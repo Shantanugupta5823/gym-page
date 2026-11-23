@@ -21,8 +21,8 @@ describe('parsePlanFile', () => {
   })
 
   it('rejects a bad day type and invalid JSON', () => {
-    const file = { ...PLAN_TEMPLATE, days: [{ ...PLAN_TEMPLATE.days[0], type: 'arms' }] }
-    expect(() => parsePlanFile(JSON.stringify(file), KNOWN)).toThrow('"type" must be push, pull or legs')
+    const file = { ...PLAN_TEMPLATE, days: [{ ...PLAN_TEMPLATE.days[0], type: 'cardio' }] }
+    expect(() => parsePlanFile(JSON.stringify(file), KNOWN)).toThrow('"type" must be push, pull, legs or arms')
     expect(() => parsePlanFile('{', KNOWN)).toThrow(ImportFileError)
   })
 })
