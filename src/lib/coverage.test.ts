@@ -4,8 +4,9 @@ import { MUSCLE_GROUPS, getMuscleCredits } from '@/lib/muscles'
 import { SEED_PLAN } from '@/db/seedPlan'
 import type { Exercise, PlanDay, Workout, WorkoutSet } from '@/db/types'
 import library from '../../public/exercises/exercises.json'
+import { CUSTOM_EXERCISES } from '@/db/customExercises'
 
-const exerciseMap = new Map((library as Exercise[]).map(exercise => [exercise.id, exercise]))
+const exerciseMap = new Map([...(library as Exercise[]), ...CUSTOM_EXERCISES].map(exercise => [exercise.id, exercise]))
 const lookup = makeCreditLookup(exerciseMap)
 const planDays: PlanDay[] = SEED_PLAN.map((day, index) => ({ ...day, id: index + 1, planId: 1, order: index + 1 }))
 
@@ -52,7 +53,7 @@ describe('getCurrentRotation', () => {
   })
 
   it('stays complete until the next day 1', () => {
-    const rotation = getCurrentRotation(planDays, [1, 2, 3, 4].map(id => workout(id, id)))
+    const rotation = getCurrentRotation(planDays, planDays.map(day => workout(day.id ?? 0, day.id ?? 0)))
     expect(rotation.isComplete).toBe(true)
   })
 

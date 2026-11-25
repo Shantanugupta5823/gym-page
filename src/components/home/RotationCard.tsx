@@ -59,14 +59,14 @@ export const RotationCard = () => {
           return (
             <li
               key={day.id}
-              className={`flex min-h-12 flex-col justify-center rounded-xl border px-2 py-1.5 ${
+              className={`flex min-h-12 flex-col justify-center rounded-xl border px-1.5 py-1.5 ${
                 isDone ? `${style.bg} border-transparent text-bg` : isNext ? `${style.border} ${style.softBg}` : 'border-border'
               }`}
             >
               <span className={`text-[10px] font-semibold uppercase tracking-wider ${isDone ? 'text-bg/70' : 'text-muted'}`}>
-                Day {index + 1} {isDone && '✓'}
+                {planDays.length > 4 ? `D${index + 1}` : `Day ${index + 1}`} {isDone && '✓'}
               </span>
-              <span className={`truncate text-xs font-semibold ${isDone ? '' : isNext ? style.text : 'text-muted'}`}>{day.name}</span>
+              <span className={`text-xs font-semibold leading-tight ${isDone ? '' : isNext ? style.text : 'text-muted'}`}>{day.name.split(' · ')[0]}</span>
             </li>
           )
         })}

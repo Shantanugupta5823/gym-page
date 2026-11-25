@@ -1,9 +1,9 @@
 import { Dexie } from 'dexie'
 import type { Table } from 'dexie'
-import { addPrepItems } from '@/db/seedPlan'
+import { addPrepItems, SEED_PLAN } from '@/db/seedPlan'
 import type { Exercise, Plan, PlanDay, SettingRow, Workout, WorkoutSet } from '@/db/types'
 
-export const DEFAULT_PLAN_NAME = 'My plan'
+export const DEFAULT_PLAN_NAME = 'Posture 6-day rotation'
 
 class GymDb extends Dexie {
   exercises!: Table<Exercise, string>
@@ -45,13 +45,22 @@ class GymDb extends Dexie {
     // Several plans: existing days move into one plan, which stays active
     this.version(6).stores({ plans: '++id', planDays: '++id, order, planId' }).upgrade(async transaction => {
       if (await transaction.table('planDays').count() === 0) return
-      const planId = await transaction.table('plans').add({ name: DEFAULT_PLAN_NAME })
+      const planId = await transaction.table('plans').add({ name: 'My plan' })
       await transaction.table('planDays').toCollection().modify({ planId })
       await transaction.table('settings').put({ key: 'activePlanId', value: planId })
     })
     // The rotation redesign starts fresh: new library (neck, traps, adductors...), the four-day plan, empty history
     this.version(7).upgrade(async transaction => {
       await Promise.all(['exercises', 'plans', 'planDays', 'workouts', 'sets', 'settings'].map(name => transaction.table(name).clear()))
+    })
+    // Posture-focused six-day rotation: history is kept, the library is reseeded (custom posture and neck drills),
+    // and the new plan is added and made active; older plans stay in the plan switcher
+    this.version(8).upgrade(async transaction => {
+      await transaction.table('exercises').clear()
+      const planId = await transaction.table('plans').add({ name: DEFAULT_PLAN_NAME })
+      await transaction.table('planDays').bulkAdd(SEED_PLAN.map((day, index) => ({ ...day, planId, order: index + 1 })))
+      await transaction.table('settings').put({ key: 'activePlanId', value: planId })
+      await transaction.table('settings').delete('weekdayPlan')
     })
   }
 }

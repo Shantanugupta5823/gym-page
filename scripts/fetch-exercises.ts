@@ -1,6 +1,7 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { SEED_PLAN } from '../src/db/seedPlan.ts'
 import { CURATED_EXERCISES, PREP_EXERCISE_IDS } from '../src/db/curatedExercises.ts'
+import { CUSTOM_EXERCISE_IDS } from '../src/db/customExercises.ts'
 
 const RAW_BASE = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main'
 const OUTPUT_DIR = 'public/exercises'
@@ -30,12 +31,13 @@ const jsonResponse = await fetchWithRetry(`${RAW_BASE}/dist/exercises.json`)
 const exercises = await jsonResponse.json() as DatasetExercise[]
 const exerciseById = new Map(exercises.map(exercise => [exercise.id, exercise]))
 
-const curatedIds = [...new Set([...Object.values(CURATED_EXERCISES).flat(), ...PREP_EXERCISE_IDS])]
+// Custom drills are not in the dataset; the app adds them itself
+const curatedIds = [...new Set([...Object.values(CURATED_EXERCISES).flat(), ...PREP_EXERCISE_IDS])].filter(id => !CUSTOM_EXERCISE_IDS.has(id))
 const seedIds = SEED_PLAN.flatMap(day => day.items.map(item => item.exerciseId))
 
 const missingIds = curatedIds.filter(id => !exerciseById.has(id))
 if (missingIds.length > 0) throw new Error(`Curated exercises missing from dataset: ${missingIds.join(', ')}`)
-const uncuratedSeedIds = seedIds.filter(id => !curatedIds.includes(id))
+const uncuratedSeedIds = seedIds.filter(id => !curatedIds.includes(id) && !CUSTOM_EXERCISE_IDS.has(id))
 if (uncuratedSeedIds.length > 0) throw new Error(`Seed plan uses uncurated exercises: ${uncuratedSeedIds.join(', ')}`)
 
 // The app shows only the first image, so only that one is shipped
