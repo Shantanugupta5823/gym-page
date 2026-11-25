@@ -28,12 +28,17 @@ export function formatRepRange (item: PlanItem): string {
   return item.repMin === item.repMax ? `${item.repMin}` : `${item.repMin}–${item.repMax}`
 }
 
+// Muscles a day trains as a primary mover, most sets first, so the main focus reads first
 export function getDayMuscles (items: PlanItem[], exerciseMap: Map<string, Exercise>): string[] {
-  const trained = new Set(getMainItems(items).flatMap(item => {
+  const setsByGroup = new Map<string, number>()
+  getMainItems(items).forEach(item => {
     const exercise = exerciseMap.get(item.exerciseId)
-    return exercise ? Object.entries(getMuscleCredits(exercise)).filter(([, credit]) => (credit ?? 0) >= 1).map(([group]) => group) : []
-  }))
-  return MUSCLE_GROUPS.filter(group => trained.has(group))
+    if (!exercise) return
+    Object.entries(getMuscleCredits(exercise)).forEach(([group, credit]) => {
+      if ((credit ?? 0) >= 1) setsByGroup.set(group, (setsByGroup.get(group) ?? 0) + item.sets)
+    })
+  })
+  return MUSCLE_GROUPS.filter(group => setsByGroup.has(group)).sort((a, b) => (setsByGroup.get(b) ?? 0) - (setsByGroup.get(a) ?? 0))
 }
 
 export function capitalize (text: string): string {

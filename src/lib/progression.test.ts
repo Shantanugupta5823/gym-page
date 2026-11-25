@@ -10,6 +10,10 @@ describe('shouldIncreaseWeight', () => {
     expect(shouldIncreaseWeight(missed, 8)).toBe(false)
     expect(shouldIncreaseWeight([], 8)).toBe(false)
   })
+
+  it('never adds weight to bodyweight sets logged at 0 kg', () => {
+    expect(shouldIncreaseWeight([{ weight: 0, reps: 12 }, { weight: 0, reps: 12 }], 12)).toBe(false)
+  })
 })
 
 describe('getPrefill', () => {

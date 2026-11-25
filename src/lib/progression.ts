@@ -11,9 +11,10 @@ interface PrefillInput {
   increment: number
 }
 
-// Double progression: every working set hit the top of the rep range
+// Double progression: every working set hit the top of the rep range. Sets logged at 0 kg are bodyweight
+// (dead bugs, chin tucks, plain pull-ups), where the next step is more reps, not a weight jump
 export function shouldIncreaseWeight (lastSets: LastSet[], repMax: number): boolean {
-  return lastSets.length > 0 && lastSets.every(set => set.reps >= repMax)
+  return lastSets.length > 0 && lastSets.every(set => set.reps >= repMax && set.weight > 0)
 }
 
 export function getPrefill ({ lastSets, setIndex, repMin, repMax, increment }: PrefillInput): LastSet {

@@ -1,13 +1,16 @@
 import { useState } from 'react'
+import { parseNumberInput } from '@/lib/sets'
 
 interface NumberInputProps {
   value: number
   onCommit: (value: number) => void
   label: string
   className?: string
+  // Called on every keystroke with the typed number (null while invalid), so a parent can act before blur
+  onDraft?: (value: number | null) => void
 }
 
-export const NumberInput = ({ value, onCommit, label, className = '' }: NumberInputProps) => {
+export const NumberInput = ({ value, onCommit, label, className = '', onDraft }: NumberInputProps) => {
   const [text, setText] = useState(String(value))
   const [syncedValue, setSyncedValue] = useState(value)
 
@@ -17,9 +20,10 @@ export const NumberInput = ({ value, onCommit, label, className = '' }: NumberIn
   }
 
   function commit (): void {
-    const parsed = Number(text.replace(',', '.'))
-    if (text.trim() === '' || Number.isNaN(parsed) || parsed < 0) {
+    const parsed = parseNumberInput(text)
+    if (parsed === null) {
       setText(String(value))
+      onDraft?.(value)
       return
     }
     if (parsed !== value) onCommit(parsed)
@@ -32,7 +36,7 @@ export const NumberInput = ({ value, onCommit, label, className = '' }: NumberIn
       inputMode="decimal"
       aria-label={label}
       value={text}
-      onChange={event => setText(event.target.value)}
+      onChange={event => { setText(event.target.value); onDraft?.(parseNumberInput(event.target.value)) }}
       onBlur={commit}
       onFocus={event => event.target.select()}
     />
