@@ -69,7 +69,7 @@ export const ExerciseProgress = () => {
         : (
           <>
             <section className={`flex items-center gap-4 rounded-3xl ${style.softBg} p-4`}>
-              <ExerciseImage exercise={exercise} className="size-20 shrink-0 rounded-2xl" />
+              <ExerciseImage exercise={exercise} className="size-20 shrink-0 rounded-2xl" isZoomable />
               <div className="min-w-0">
                 <p className={`text-xs font-semibold uppercase tracking-wider ${style.text}`}>{style.label}</p>
                 <h2 className="font-heading text-xl font-semibold leading-tight">{exercise?.name ?? exerciseId}</h2>

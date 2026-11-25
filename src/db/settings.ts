@@ -11,7 +11,8 @@ export const DEFAULT_SETTINGS: Settings = {
   restDefault: 90,
   increment: 2.5,
   weeklyTarget: 7,
-  weekdayPlan: {}
+  weekdayPlan: {},
+  tutorialVideos: {}
 }
 
 export function useSettings (): Settings {

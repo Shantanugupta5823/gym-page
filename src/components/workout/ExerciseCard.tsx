@@ -26,7 +26,7 @@ export const ExerciseCard = ({ workoutId, item, exercise, sets, unit, increment,
   return (
     <section className="rounded-3xl bg-surface p-4">
       <div className="flex gap-3">
-        <ExerciseImage exercise={exercise} className="size-24 shrink-0 rounded-2xl" />
+        <ExerciseImage exercise={exercise} className="size-24 shrink-0 rounded-2xl" isZoomable />
         <div className="min-w-0">
           <h2 className="font-heading text-xl font-semibold leading-tight">{exercise?.name ?? item.exerciseId}</h2>
           <p className="mt-1 text-xs text-muted">{(exercise?.primaryMuscles ?? []).map(capitalize).join(', ')}</p>

@@ -49,7 +49,7 @@ export const PlanItemRow = ({ item, exercise, isEditing, isRestTimerEnabled, isD
             ⠿
           </button>
         )}
-        <ExerciseImage exercise={exercise} className="size-11 shrink-0 rounded-xl" />
+        <ExerciseImage exercise={exercise} className="size-11 shrink-0 rounded-xl" isZoomable />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium">{exercise?.name ?? item.exerciseId}</p>
           <p className="flex items-center gap-1.5 truncate text-xs capitalize text-muted">
