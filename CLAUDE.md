@@ -30,7 +30,7 @@ It has no backend: all data lives on the device in IndexedDB. It is hosted free 
 ## Screens
 1. **Home / Dashboard**
    - Greeting and date
-   - "Today" card with the next rotation day ("Day N of 4") name, its muscles, exercise count, estimated time, and a **Start workout** button
+   - "Today" card with the next rotation day ("Day N of M") name, its muscles, exercise count, estimated time, and a **Start workout** button
    - **Rotation card**: day pills (done ✓ / next / upcoming) and the **body map**: a male figure you drag to turn 180° (front ↔ back) or flip with Turn.
      Each of the 17 muscles fills from grey through dark green to bright green as this rotation's sets are ticked off; the next workout's muscles are outlined in its day colour.
      Tap a muscle for done/target sets and the days that train it; "Show all muscles" lists every bar.
@@ -71,14 +71,20 @@ settings:   key/value (unit, rotationMode, restDefault, increment)
 ## Progression hint (double progression)
 If every working set of an exercise last session hit `repMax`, show a "↑ try +2.5 kg" chip and prefill the weight +increment. Otherwise prefill the same weight.
 
-## Seed plan: four-day rotation (editable in the Plan tab)
-Trained every day, on rotation (not weekdays). Goal: aesthetics plus strength, every body-map muscle (neck included) at least once per rotation; delts, arms, back width, core and neck twice.
-Each day opens with one heavy lift (4 × 5–8, 3 min rest), then compounds 8–12, isolation 10–15 and pump work 12–20. 8–10 exercises, about 75–90 min with warm-up and stretches.
-1. **Push**: Chest, Shoulders, Triceps, Neck (flexion)
-2. **Pull**: Back, Rear delts, Traps, Biceps, Forearms, Neck (extension)
-3. **Legs**: Quads, Hamstrings, Glutes, Adductors, Calves, Abs
-4. **Delts & Arms**: Shoulders, Rear delts, Back (chin-ups), Biceps, Triceps, Forearms, Abs, Obliques, Neck (sides)
-Exact exercises live in `src/db/seedPlan.ts`. The DB v7 upgrade wiped all data for this redesign (fresh start).
+## Seed plan: posture-focused six-day rotation (editable in the Plan tab)
+Trained every day, on rotation (not weekdays). Goals: lean, aesthetic physique with every muscle trained; fix rounded shoulders and anterior pelvic tilt; strong leg definition.
+Heavy lifts 4-5 sets, everything else 2-3 sets.
+- **Block A, every day**: warm-up band pull-aparts, wall slides, upper-back foam roll, pelvic tilt into bridge; cool-down doorway chest stretch and couch (hip flexor) stretch
+- **Neck, every day**: plate neck curl + extension on days 1, 3, 5; side isometrics + chin tucks on days 2, 4, 6
+- **Forearms (4 exercises)** on days 1, 3, 5; **abs (5: 3 core, 2 obliques)** on days 2, 4, 6
+1. **Push A**: Chest (incline DB heavy, flat DB, cable fly, butterfly, low-to-high fly) + Triceps (overhead, rope, machine, dips)
+2. **Pull A, back width**: weighted pull-ups heavy, lat pulldowns, straight-arm pulldown, face pulls + Biceps (DB, incline, hammer)
+3. **Legs A, quads**: squat, hack squat, leg press, Bulgarian split squat, leg extension, adductor, calves + Shoulders (press, laterals, reverse pec deck)
+4. **Push B**: same chest/triceps, flat DB heavy first
+5. **Pull B, back thickness**: deadlift heavy, T-bar row, chest-supported row, shrugs, prone Y-raise + Biceps
+6. **Legs B, hamstrings and glutes**: RDL (moderate, after deadlifts), hip thrust, lying and seated leg curl, glute-ham raise, abductor, calves + Shoulders (machine press, cable laterals, face pulls)
+Exact exercises live in `src/db/seedPlan.ts`. Wall slides, chin tucks and prone Y-raise are custom drills in `src/db/customExercises.ts` (no image).
+DB v8 keeps history, reseeds the library and adds this plan as the active one; older plans stay in the plan switcher.
 
 ## Exercise library
 - Curated, at most 20 per muscle, one list per body-map muscle (17: Neck, Traps, Shoulders, Rear delts, Chest, Back, Lower back, Biceps, Triceps, Forearms, Abs, Obliques, Glutes, Quads, Hamstrings, Adductors, Calves) in `src/db/curatedExercises.ts`.
