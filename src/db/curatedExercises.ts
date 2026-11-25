@@ -4,7 +4,7 @@ import type { MuscleGroup } from '../lib/muscles.ts'
 // An exercise is listed once, under the muscle it mostly trains; the dataset has few neck, trap and adductor options
 export const CURATED_EXERCISES: Record<MuscleGroup, string[]> = {
   Neck: [
-    'Lying_Face_Up_Plate_Neck_Resistance', 'Lying_Face_Down_Plate_Neck_Resistance',
+    'Custom_Chin_Tuck', 'Lying_Face_Up_Plate_Neck_Resistance', 'Lying_Face_Down_Plate_Neck_Resistance',
     'Isometric_Neck_Exercise_-_Front_And_Back', 'Isometric_Neck_Exercise_-_Sides', 'Seated_Head_Harness_Neck_Resistance'
   ],
   Traps: ['Barbell_Shrug', 'Dumbbell_Shrug', 'Upright_Barbell_Row'],
@@ -15,7 +15,7 @@ export const CURATED_EXERCISES: Record<MuscleGroup, string[]> = {
     'Standing_Low-Pulley_Deltoid_Raise', 'One-Arm_Side_Laterals', 'Front_Two-Dumbbell_Raise', 'Front_Cable_Raise'
   ],
   'Rear delts': [
-    'Face_Pull', 'Cable_Rear_Delt_Fly', 'Reverse_Flyes', 'Reverse_Machine_Flyes',
+    'Face_Pull', 'Custom_Prone_Y_Raise', 'Cable_Rear_Delt_Fly', 'Reverse_Flyes', 'Reverse_Machine_Flyes',
     'Bent_Over_Dumbbell_Rear_Delt_Raise_With_Head_On_Bench'
   ],
   Chest: [
@@ -27,7 +27,7 @@ export const CURATED_EXERCISES: Record<MuscleGroup, string[]> = {
     'Straight-Arm_Dumbbell_Pullover'
   ],
   Back: [
-    'Pullups', 'Chin-Up', 'Wide-Grip_Lat_Pulldown', 'Bent_Over_Barbell_Row', 'Seated_Cable_Rows', 'One-Arm_Dumbbell_Row',
+    'Pullups', 'Chin-Up', 'Wide-Grip_Lat_Pulldown', 'One_Arm_Lat_Pulldown', 'Dumbbell_Incline_Row', 'Bent_Over_Barbell_Row', 'Seated_Cable_Rows', 'One-Arm_Dumbbell_Row',
     'T-Bar_Row_with_Handle', 'Close-Grip_Front_Lat_Pulldown', 'V-Bar_Pulldown',
     'Underhand_Cable_Pulldowns', 'Straight-Arm_Pulldown', 'Lying_T-Bar_Row', 'Leverage_High_Row',
     'Leverage_Iso_Row', 'Smith_Machine_Bent_Over_Row', 'Bent_Over_Two-Dumbbell_Row'
@@ -53,10 +53,9 @@ export const CURATED_EXERCISES: Record<MuscleGroup, string[]> = {
     'Palms-Up_Barbell_Wrist_Curl_Over_A_Bench', 'Palms-Down_Wrist_Curl_Over_A_Bench',
     'Seated_Dumbbell_Palms-Up_Wrist_Curl', 'Seated_Dumbbell_Palms-Down_Wrist_Curl',
     'Palms-Up_Dumbbell_Wrist_Curl_Over_A_Bench', 'Palms-Down_Dumbbell_Wrist_Curl_Over_A_Bench', 'Cable_Wrist_Curl',
-    'Wrist_Roller', 'Plate_Pinch', 'Finger_Curls', 'Standing_Olympic_Plate_Hand_Squeeze',
+    'Wrist_Roller', 'Farmers_Walk', 'Plate_Pinch', 'Finger_Curls', 'Standing_Olympic_Plate_Hand_Squeeze',
     'Seated_One-Arm_Dumbbell_Palms-Up_Wrist_Curl', 'Seated_One-Arm_Dumbbell_Palms-Down_Wrist_Curl',
-    'Seated_Palm-Up_Barbell_Wrist_Curl', 'Seated_Palms-Down_Barbell_Wrist_Curl', 'Dumbbell_Lying_Supination',
-    'Dumbbell_Lying_Pronation'
+    'Seated_Palm-Up_Barbell_Wrist_Curl', 'Seated_Palms-Down_Barbell_Wrist_Curl', 'Dumbbell_Lying_Supination'
   ],
   Abs: [
     'Cable_Crunch', 'Hanging_Leg_Raise', 'Ab_Crunch_Machine', 'Crunches', 'Decline_Crunch', 'Reverse_Crunch', 'Plank',
@@ -73,12 +72,12 @@ export const CURATED_EXERCISES: Record<MuscleGroup, string[]> = {
     'Barbell_Full_Squat', 'Front_Squat_Clean_Grip', 'Hack_Squat', 'Leg_Press', 'Leg_Extensions', 'Dumbbell_Lunges',
     'Barbell_Lunge', 'Barbell_Walking_Lunge', 'Split_Squat_with_Dumbbells', 'Goblet_Squat', 'Dumbbell_Squat',
     'Smith_Machine_Squat', 'Barbell_Step_Ups', 'Dumbbell_Step_Ups', 'Narrow_Stance_Leg_Press',
-    'Single-Leg_Leg_Extension', 'Barbell_Hack_Squat', 'Dumbbell_Rear_Lunge', 'Smith_Machine_Leg_Press',
+    'Single-Leg_Leg_Extension', 'Barbell_Hack_Squat', 'Dumbbell_Rear_Lunge', 'Weighted_Sissy_Squat',
     'Wide_Stance_Barbell_Squat'
   ],
   Hamstrings: [
     'Romanian_Deadlift', 'Lying_Leg_Curls', 'Seated_Leg_Curl', 'Stiff-Legged_Barbell_Deadlift', 'Standing_Leg_Curl',
-    'Stiff-Legged_Dumbbell_Deadlift', 'Natural_Glute_Ham_Raise', 'Smith_Machine_Stiff-Legged_Deadlift',
+    'Stiff-Legged_Dumbbell_Deadlift', 'Natural_Glute_Ham_Raise', 'Glute_Ham_Raise', 'Smith_Machine_Stiff-Legged_Deadlift',
     'Kettlebell_One-Legged_Deadlift', 'Romanian_Deadlift_from_Deficit', 'Platform_Hamstring_Slides',
     'Seated_Band_Hamstring_Curl', 'Ball_Leg_Curl', 'One-Arm_Kettlebell_Swings'
   ],
@@ -100,7 +99,8 @@ export const WARMUP_EXERCISES: ExerciseLibrary = {
     'Arm_Circles', 'Shoulder_Circles', 'Elbow_Circles', 'Wrist_Circles', 'Torso_Rotation', 'Standing_Hip_Circles',
     'Knee_Circles', 'Ankle_Circles', 'Inchworm', 'Worlds_Greatest_Stretch', 'Cat_Stretch', 'Band_Pull_Apart',
     'Windmills', 'Standing_Toe_Touches'
-  ]
+  ],
+  Posture: ['Custom_Wall_Slide', 'Rhomboids-SMR', 'Pelvic_Tilt_Into_Bridge', 'Standing_Pelvic_Tilt']
 }
 
 export const STRETCH_EXERCISES: ExerciseLibrary = {
@@ -109,7 +109,7 @@ export const STRETCH_EXERCISES: ExerciseLibrary = {
   Shoulders: ['Shoulder_Stretch', 'Seated_Front_Deltoid'],
   Neck: ['Side_Neck_Stretch', 'Chin_To_Chest_Stretch'],
   Arms: ['Standing_Biceps_Stretch', 'Seated_Biceps', 'Triceps_Stretch', 'Tricep_Side_Stretch', 'Overhead_Triceps', 'Kneeling_Forearm_Stretch'],
-  Quads: ['Quad_Stretch', 'Standing_Elevated_Quad_Stretch', 'On-Your-Back_Quad_Stretch', 'Kneeling_Hip_Flexor', 'Standing_Hip_Flexors'],
+  Quads: ['Intermediate_Hip_Flexor_and_Quad_Stretch', 'Quad_Stretch', 'Standing_Elevated_Quad_Stretch', 'On-Your-Back_Quad_Stretch', 'Kneeling_Hip_Flexor', 'Standing_Hip_Flexors'],
   Hamstrings: ['Hamstring_Stretch', 'Seated_Floor_Hamstring_Stretch', 'Standing_Hamstring_and_Calf_Stretch', 'Lying_Hamstring', '90_90_Hamstring'],
   Glutes: ['Seated_Glute', 'Knee_Across_The_Body', 'Lying_Glute', 'One_Knee_To_Chest', 'Hug_Knees_To_Chest'],
   Calves: ['Calf_Stretch_Hands_Against_Wall', 'Standing_Gastrocnemius_Calf_Stretch', 'Seated_Calf_Stretch', 'Standing_Soleus_And_Achilles_Stretch'],
