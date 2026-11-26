@@ -10,8 +10,16 @@ const BASE = IS_PREVIEW ? './' : '/gym-page/'
 const THEME_COLOR = '#0B0B0C'
 const MAX_PRECACHE_BYTES = 3 * 1024 * 1024
 
+// Shown in Settings so it is easy to tell which version the phone is running
+const APP_VERSION = (process.env.GITHUB_SHA ?? 'dev').slice(0, 7)
+const BUILT_AT = new Date().toISOString()
+
 export default defineConfig({
   base: BASE,
+  define: {
+    __APP_VERSION__: JSON.stringify(APP_VERSION),
+    __BUILT_AT__: JSON.stringify(BUILT_AT)
+  },
   plugins: [
     react(),
     tailwindcss(),
