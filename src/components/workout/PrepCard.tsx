@@ -22,7 +22,7 @@ export const PrepCard = ({ item, phase, exercise, sets, accentBg }: PrepCardProp
   return (
     <section className="rounded-3xl bg-surface p-4">
       <div className="flex gap-3">
-        <ExerciseImage exercise={exercise} className="size-24 shrink-0 rounded-2xl" />
+        <ExerciseImage exercise={exercise} className="size-24 shrink-0 rounded-2xl" isZoomable />
         <div className="min-w-0">
           <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${badge}`}>{label}</span>
           <h2 className="mt-1 font-heading text-xl font-semibold leading-tight">{exercise?.name ?? item.exerciseId}</h2>

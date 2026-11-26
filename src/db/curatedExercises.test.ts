@@ -21,6 +21,13 @@ describe('curated exercises', () => {
     expect([...PREP_EXERCISE_IDS].filter(id => strengthIds.has(id))).toEqual([])
   })
 
+  it('never repeats an exercise within a day, since a workout keys its sets by exercise', () => {
+    SEED_PLAN.forEach(day => {
+      const ids = day.items.map(item => item.exerciseId)
+      expect(new Set(ids).size).toBe(ids.length)
+    })
+  })
+
   it('seeds warm-ups first and stretches last on every day', () => {
     SEED_PLAN.forEach(day => {
       expect(day.items[0].phase).toBe('warmup')

@@ -64,6 +64,11 @@ export async function updateSet (id: number, patch: Partial<Pick<WorkoutSet, 'we
   await db.sets.update(id, patch)
 }
 
+// Saves the typed numbers and ticks the set in one write
+export async function completeSet (id: number, values: Pick<WorkoutSet, 'weight' | 'reps'>): Promise<void> {
+  await db.sets.update(id, { ...values, done: true, createdAt: Date.now() })
+}
+
 export async function setSetDone (id: number, done: boolean): Promise<void> {
   await db.sets.update(id, { done, createdAt: Date.now() })
 }

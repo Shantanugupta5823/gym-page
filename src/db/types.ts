@@ -70,6 +70,8 @@ export interface Settings {
   increment: number
   weeklyTarget: number
   weekdayPlan: Record<number, number | null>
+  // Exercise id -> YouTube video id the user picked instead of the built-in tutorial
+  tutorialVideos: Record<string, string>
 }
 
 export interface SettingRow {
