@@ -194,6 +194,10 @@ export const Settings = () => {
           Reset everything
         </button>
       </section>
+
+      <p className="text-center text-xs text-muted">
+        Version {__APP_VERSION__} · updated {new Date(__BUILT_AT__).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+      </p>
     </main>
   )
 }
