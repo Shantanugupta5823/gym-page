@@ -43,6 +43,8 @@ const CREDIT_OVERRIDES: Record<string, MuscleCredits> = {
   Reverse_Machine_Flyes: { 'Rear delts': 1, Traps: 0.5 },
   Cable_Rear_Delt_Fly: { 'Rear delts': 1 },
   Custom_Prone_Y_Raise: { 'Rear delts': 1, Traps: 1 },
+  Custom_Wide_Leg_Press: { Glutes: 1, Adductors: 1, Quads: 0.5, Hamstrings: 0.5 },
+  Custom_Single_Arm_DB_RDL: { Hamstrings: 1, Glutes: 1 },
   One_Arm_Lat_Pulldown: { Back: 1, Biceps: 0.5 },
   Farmers_Walk: { Forearms: 1, Traps: 0.5 },
   Weighted_Sissy_Squat: { Quads: 1 },

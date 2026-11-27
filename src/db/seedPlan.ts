@@ -141,9 +141,9 @@ const MAIN_DAYS: SeedDay[] = [
       // Moderate weight: deadlifts were the day before
       item('Romanian_Deadlift', 4, 8, 10, 150),
       compound('Barbell_Hip_Thrust', 4, 8, 10),
-      isolation('Lying_Leg_Curls', 3, 10, 12),
-      isolation('Seated_Leg_Curl', 3, 12, 15),
-      item('Natural_Glute_Ham_Raise', 2, 6, 10, 90),
+      isolation('Lying_Leg_Curls', 4, 10, 12),
+      compound('Custom_Wide_Leg_Press', 3, 10, 15),
+      isolation('Custom_Single_Arm_DB_RDL', 2, 10, 12),
       short('Thigh_Abductor', 2, 15, 20),
       short('Seated_Calf_Raise', 3, 12, 15),
       compound('Machine_Shoulder_Military_Press', 3, 8, 12),

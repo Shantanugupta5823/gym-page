@@ -1,6 +1,8 @@
 import { Dexie } from 'dexie'
 import type { Table } from 'dexie'
 import { addPrepItems, SEED_PLAN } from '@/db/seedPlan'
+import { CUSTOM_EXERCISES } from '@/db/customExercises'
+import { swapLegsBHamstringWork } from '@/db/planMigrations'
 import type { Exercise, Plan, PlanDay, SettingRow, Workout, WorkoutSet } from '@/db/types'
 
 export const DEFAULT_PLAN_NAME = 'Posture 6-day rotation'
@@ -61,6 +63,14 @@ class GymDb extends Dexie {
       await transaction.table('planDays').bulkAdd(SEED_PLAN.map((day, index) => ({ ...day, planId, order: index + 1 })))
       await transaction.table('settings').put({ key: 'activePlanId', value: planId })
       await transaction.table('settings').delete('weekdayPlan')
+    })
+    // Legs B without a seated curl or glute-ham bench (wide leg press and single-arm dumbbell RDL instead): workouts, sets and the rotation are untouched,
+    // only the plan days change and the two new custom exercises are added to the library
+    this.version(9).upgrade(async transaction => {
+      await transaction.table('exercises').bulkPut(CUSTOM_EXERCISES)
+      await transaction.table('planDays').toCollection().modify((day: PlanDay) => {
+        day.items = swapLegsBHamstringWork(day.items)
+      })
     })
   }
 }

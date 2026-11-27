@@ -64,7 +64,7 @@ export const CURATED_EXERCISES: Record<MuscleGroup, string[]> = {
   ],
   Obliques: ['Standing_Cable_Wood_Chop', 'Pallof_Press', 'Russian_Twist', 'Dumbbell_Side_Bend', 'Oblique_Crunches', 'Side_Bridge'],
   Glutes: [
-    'Barbell_Hip_Thrust', 'Barbell_Glute_Bridge', 'Single_Leg_Glute_Bridge', 'Glute_Kickback',
+    'Barbell_Hip_Thrust', 'Custom_Wide_Leg_Press', 'Barbell_Glute_Bridge', 'Single_Leg_Glute_Bridge', 'Glute_Kickback',
     'One-Legged_Cable_Kickback', 'Pull_Through', 'Butt_Lift_Bridge', 'Step-up_with_Knee_Raise', 'Thigh_Abductor',
     'Reverse_Hyperextension'
   ],
@@ -76,7 +76,7 @@ export const CURATED_EXERCISES: Record<MuscleGroup, string[]> = {
     'Wide_Stance_Barbell_Squat'
   ],
   Hamstrings: [
-    'Romanian_Deadlift', 'Lying_Leg_Curls', 'Seated_Leg_Curl', 'Stiff-Legged_Barbell_Deadlift', 'Standing_Leg_Curl',
+    'Romanian_Deadlift', 'Lying_Leg_Curls', 'Seated_Leg_Curl', 'Custom_Single_Arm_DB_RDL', 'Stiff-Legged_Barbell_Deadlift', 'Standing_Leg_Curl',
     'Stiff-Legged_Dumbbell_Deadlift', 'Natural_Glute_Ham_Raise', 'Glute_Ham_Raise', 'Smith_Machine_Stiff-Legged_Deadlift',
     'Kettlebell_One-Legged_Deadlift', 'Romanian_Deadlift_from_Deficit', 'Platform_Hamstring_Slides',
     'Seated_Band_Hamstring_Curl', 'Ball_Leg_Curl', 'One-Arm_Kettlebell_Swings'
