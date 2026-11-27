@@ -53,6 +53,8 @@ export const TUTORIAL_VIDEOS: Record<string, string> = {
   Lying_Leg_Curls: 'd6sg829PgNs',
   Seated_Leg_Curl: 'YpMJzmkFy2E',
   Natural_Glute_Ham_Raise: 'X-j0ZMDy-QE',
+  Custom_Wide_Leg_Press: 'ub8ji8lf--4',
+  Custom_Single_Arm_DB_RDL: 'JW0gJX5k4K8',
   // Abs
   Hanging_Leg_Raise: '0wSUjj5j1xo',
   Cable_Crunch: 'bd63yN6g_9w',

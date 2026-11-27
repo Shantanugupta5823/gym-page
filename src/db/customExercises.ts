@@ -43,6 +43,34 @@ export const CUSTOM_EXERCISES: Exercise[] = [
       'Raise your arms up and out into a "Y", leading with your thumbs, and squeeze your lower traps.',
       'Pause for 1 second at the top, then lower slowly.'
     ]
+  },
+  {
+    id: 'Custom_Wide_Leg_Press',
+    name: 'Wide Leg Press (Feet High)',
+    primaryMuscles: ['glutes'],
+    secondaryMuscles: ['adductors', 'quadriceps', 'hamstrings'],
+    equipment: 'machine',
+    category: 'strength',
+    images: ['Leg_Press/0.jpg'],
+    instructions: [
+      'Sit in the leg press with your feet high on the platform, wider than shoulder width, toes turned out slightly.',
+      'Unlock the sled and lower it until your hips are about to lift off the seat, keeping your knees in line with your toes.',
+      'Push through your heels to straighten your legs without locking your knees, squeezing your glutes at the top.'
+    ]
+  },
+  {
+    id: 'Custom_Single_Arm_DB_RDL',
+    name: 'Single-Arm Dumbbell RDL (Single Leg)',
+    primaryMuscles: ['hamstrings'],
+    secondaryMuscles: ['glutes'],
+    equipment: 'dumbbell',
+    category: 'strength',
+    images: ['Kettlebell_One-Legged_Deadlift/0.jpg'],
+    instructions: [
+      'Stand on one leg with a slight knee bend, holding a dumbbell in the opposite hand.',
+      'Hinge at the hip, reaching the dumbbell toward the floor while the free leg travels straight back; keep your hips square.',
+      'Lower until you feel a strong hamstring stretch, then drive the hip forward to stand tall. Do every rep on one leg, then switch.'
+    ]
   }
 ]
 
